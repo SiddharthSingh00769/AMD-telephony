@@ -1,0 +1,114 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for Better-Auth
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String   // Hashed by Better-Auth
+  
+  calls     Call[]
+  sessions  Session[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Session model for Better-Auth
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  token     String   @unique
+  expiresAt DateTime
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId])
+}
+
+// Call logs with comprehensive tracking
+model Call {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  
+  // Call details
+  phoneNumber   String
+  direction     String   @default("outbound") // outbound/inbound
+  
+  // AMD Strategy
+  amdStrategy   String   // 'twilio', 'jambonz', 'huggingface', 'gemini'
+  
+  // Call status tracking
+  status        String   // 'initiated', 'ringing', 'in-progress', 'completed', 'failed', 'no-answer', 'busy'
+  
+  // AMD Results
+  amdResult     String?  // 'human', 'machine', 'machine_start', 'machine_end_beep', 'fax', 'undecided', 'error'
+  confidence    Float?   // 0.0 to 1.0
+  
+  // Timing
+  duration      Int?     // seconds
+  amdDuration   Int?     // Time taken for AMD detection in ms
+  
+  // Cost tracking
+  cost          Float?
+  
+  // Twilio/External IDs
+  twilioSid     String?  @unique
+  jambonzCallId String?  @unique
+  
+  // Error handling
+  errorMessage  String?
+  errorCode     String?
+  
+  // Audio recording URL (optional)
+  recordingUrl  String?
+  
+  // Metadata for analysis
+  metadata      Json?    // Store additional data like audio features, retry attempts, etc.
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([createdAt])
+  @@index([amdStrategy])
+  @@index([status])
+  @@index([amdResult])
+}
+
+// Test results for comparison
+model TestResult {
+  id            String   @id @default(cuid())
+  
+  testNumber    String   // Phone number tested
+  expectedResult String  // 'human' or 'machine'
+  
+  amdStrategy   String
+  actualResult  String
+  confidence    Float?
+  
+  latency       Int      // ms
+  cost          Float?
+  
+  correct       Boolean  // Did it match expected?
+  
+  callId        String?  // Reference to Call if applicable
+  
+  notes         String?
+  
+  createdAt     DateTime @default(now())
+  
+  @@index([amdStrategy])
+  @@index([testNumber])
+}
