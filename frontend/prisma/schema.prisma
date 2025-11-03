@@ -8,21 +8,45 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User model for Better-Auth
+// ✅ Better-Auth compatible User model
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  password  String   // Hashed by Better-Auth
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  name          String?
+  image         String?
   
-  calls     Call[]
-  sessions  Session[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // Relations
+  calls         Call[]
+  sessions      Session[]
+  accounts      Account[]
 }
 
-// Session model for Better-Auth
+// ✅ Better-Auth Account model (stores passwords)
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  accountId         String
+  providerId        String
+  accessToken       String?
+  refreshToken      String?
+  idToken           String?
+  expiresAt         DateTime?
+  password          String? // ✅ Password stored here
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+// ✅ Better-Auth Session model
 model Session {
   id        String   @id @default(cuid())
   userId    String
@@ -30,52 +54,50 @@ model Session {
   
   token     String   @unique
   expiresAt DateTime
+  ipAddress String?
+  userAgent String?
   
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   
   @@index([userId])
+  @@index([token])
 }
 
-// Call logs with comprehensive tracking
+// ✅ Verification model for Better-Auth
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  @@unique([identifier, value])
+}
+
+// Call logs (unchanged)
 model Call {
   id            String   @id @default(cuid())
   userId        String
   user          User     @relation(fields: [userId], references: [id])
   
-  // Call details
   phoneNumber   String
-  direction     String   @default("outbound") // outbound/inbound
-  
-  // AMD Strategy
-  amdStrategy   String   // 'twilio', 'jambonz', 'huggingface', 'gemini'
-  
-  // Call status tracking
-  status        String   // 'initiated', 'ringing', 'in-progress', 'completed', 'failed', 'no-answer', 'busy'
-  
-  // AMD Results
-  amdResult     String?  // 'human', 'machine', 'machine_start', 'machine_end_beep', 'fax', 'undecided', 'error'
-  confidence    Float?   // 0.0 to 1.0
-  
-  // Timing
-  duration      Int?     // seconds
-  amdDuration   Int?     // Time taken for AMD detection in ms
-  
-  // Cost tracking
+  direction     String   @default("outbound")
+  amdStrategy   String
+  status        String
+  amdResult     String?
+  confidence    Float?
+  duration      Int?
+  amdDuration   Int?
   cost          Float?
-  
-  // Twilio/External IDs
   twilioSid     String?  @unique
   jambonzCallId String?  @unique
-  
-  // Error handling
   errorMessage  String?
   errorCode     String?
-  
-  // Audio recording URL (optional)
   recordingUrl  String?
-  
-  // Metadata for analysis
-  metadata      Json?    // Store additional data like audio features, retry attempts, etc.
+  metadata      Json?
   
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -87,27 +109,20 @@ model Call {
   @@index([amdResult])
 }
 
-// Test results for comparison
+// Test results (unchanged)
 model TestResult {
-  id            String   @id @default(cuid())
-  
-  testNumber    String   // Phone number tested
-  expectedResult String  // 'human' or 'machine'
-  
-  amdStrategy   String
-  actualResult  String
-  confidence    Float?
-  
-  latency       Int      // ms
-  cost          Float?
-  
-  correct       Boolean  // Did it match expected?
-  
-  callId        String?  // Reference to Call if applicable
-  
-  notes         String?
-  
-  createdAt     DateTime @default(now())
+  id             String   @id @default(cuid())
+  testNumber     String
+  expectedResult String
+  amdStrategy    String
+  actualResult   String
+  confidence     Float?
+  latency        Int
+  cost           Float?
+  correct        Boolean
+  callId         String?
+  notes          String?
+  createdAt      DateTime @default(now())
   
   @@index([amdStrategy])
   @@index([testNumber])
