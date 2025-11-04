@@ -70,7 +70,7 @@ export async function detectWithGemini(
     // Download audio file
     const audioBase64 = await downloadAudioAsBase64(audioUrl);
 
-    // Use Gemini Pro model with vision/audio capabilities
+    // Use Gemini model with vision/audio capabilities
     const model = genAI.getGenerativeModel({ 
       model: "gemini-2.5-flash"  
     });
@@ -78,70 +78,70 @@ export async function detectWithGemini(
     // Create the analysis prompt
     const prompt = `You are an expert answering machine detection (AMD) system analyzing phone call recordings.
 
-TASK:
-Determine if this call was answered by a HUMAN or an ANSWERING MACHINE.
+    TASK:
+    Determine if this call was answered by a HUMAN or an ANSWERING MACHINE.
 
-IMPORTANT:
-At the beginning of every call, you may hear a Twilio system message like:
-"You have a trial account. You can remove this message at any time by upgrading to a full account. Press any key to execute your code."
-➡️ Completely IGNORE this segment. It is NOT part of the actual call. 
-Start your analysis ONLY after this message ends.
+    IMPORTANT:
+    At the beginning of every call, you may hear a Twilio system message like:
+    "You have a trial account. You can remove this message at any time by upgrading to a full account. Press any key to execute your code."
+    ➡️ Completely IGNORE this segment. It is NOT part of the actual call. 
+    Start your analysis ONLY after this message ends.
 
-ALSO IGNORE this automated ENDING message (if present):
-"This is a test call. The answering machine detection is now complete. Thank you for answering."
-➡️ This is NOT spoken by a human. It is a pre-recorded Twilio test message and must not be mistaken for a human response.
+    ALSO IGNORE this automated ENDING message (if present):
+    "This is a test call. The answering machine detection is now complete. Thank you for answering."
+    ➡️ This is NOT spoken by a human. It is a pre-recorded Twilio test message and must not be mistaken for a human response.
 
-AUDIO DETAILS:
-- Recording URL: ${audioUrl}
-- Duration: ${recordingDuration} seconds
-- Format: Phone call recording (WAV/MP3)
+    AUDIO DETAILS:
+    - Recording URL: ${audioUrl}
+    - Duration: ${recordingDuration} seconds
+    - Format: Phone call recording (WAV/MP3)
 
-CRITICAL DETECTION RULES:
+    CRITICAL DETECTION RULES:
 
-🤖 ANSWERING MACHINE indicators:
-1. Pre-recorded greeting phrases:
-   - "Hi, you've reached..."
-   - "Thank you for calling..."
-   - "Please leave a message..."
-   - "I'm not available right now..."
-   - "You have reached the voicemail of..."
-   - "Press 1 for...", "Press 2 for..."
-2. Scripted, professional tone with perfect clarity
-3. Consistent pacing, no filler words
-4. Background music or hold tones
-5. Beep sound after the message
-6. Menu options or IVR prompts
-7. Multiple rings followed by an automated voice
+    🤖 ANSWERING MACHINE indicators:
+    1. Pre-recorded greeting phrases:
+      - "Hi, you've reached..."
+      - "Thank you for calling..."
+      - "Please leave a message..."
+      - "I'm not available right now..."
+      - "You have reached the voicemail of..."
+      - "Press 1 for...", "Press 2 for..."
+    2. Scripted, professional tone with perfect clarity
+    3. Consistent pacing, no filler words
+    4. Background music or hold tones
+    5. Beep sound after the message
+    6. Menu options or IVR prompts
+    7. Multiple rings followed by an automated voice
 
-👤 HUMAN indicators:
-1. Natural greetings like "Hello?", "Yes?", "Hi", "Who is this?"
-2. Spontaneous, conversational tone
-3. Background noise (TV, people, traffic)
-4. Filler words ("uh", "um", "like")
-5. Varying speech pace or intonation
-6. Questions asked quickly after pickup
-7. Emotional tone (curiosity, irritation, friendliness)
+    👤 HUMAN indicators:
+    1. Natural greetings like "Hello?", "Yes?", "Hi", "Who is this?"
+    2. Spontaneous, conversational tone
+    3. Background noise (TV, people, traffic)
+    4. Filler words ("uh", "um", "like")
+    5. Varying speech pace or intonation
+    6. Questions asked quickly after pickup
+    7. Emotional tone (curiosity, irritation, friendliness)
 
-EDGE CASES:
-- Only ringing/silence: return "unknown"
-- Very short recordings (<2s speech): return "unknown"
-- Poor audio quality or no distinguishable speech: return "unknown"
-- If the only audible speech is Twilio’s automated ending message ("This is a test call..."), return "unknown"
-- If the caller or callee remains silent throughout and only system messages are heard: return "unknown"
+    EDGE CASES:
+    - Only ringing/silence: return "unknown"
+    - Very short recordings (<2s speech): return "unknown"
+    - Poor audio quality or no distinguishable speech: return "unknown"
+    - If the only audible speech is Twilio’s automated ending message ("This is a test call..."), return "unknown"
+    - If the caller or callee remains silent throughout and only system messages are heard: return "unknown"
 
-CONFIDENCE SCORING:
-- 0.9-1.0 → Crystal clear evidence
-- 0.7-0.89 → Strong indicators
-- 0.5-0.69 → Moderate indicators
-- 0.3-0.49 → Weak indicators
-- 0.0-0.29 → Very unclear
+    CONFIDENCE SCORING:
+    - 0.9-1.0 → Crystal clear evidence
+    - 0.7-0.89 → Strong indicators
+    - 0.5-0.69 → Moderate indicators
+    - 0.3-0.49 → Weak indicators
+    - 0.0-0.29 → Very unclear
 
-RESPONSE FORMAT (valid JSON only):
-{
-  "result": "human" | "machine" | "unknown",
-  "confidence": 0.0-1.0,
-  "reasoning": "Brief explanation of what was heard and which indicators were present (ignore both the Twilio trial and ending messages)."
-}`;
+    RESPONSE FORMAT (valid JSON only):
+    {
+      "result": "human" | "machine" | "unknown",
+      "confidence": 0.0-1.0,
+      "reasoning": "Brief explanation of what was heard and which indicators were present (ignore both the Twilio trial and ending messages)."
+    }`;
 
     // Send audio and prompt to Gemini
     const result = await model.generateContent([

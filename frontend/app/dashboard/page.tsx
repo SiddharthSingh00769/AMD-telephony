@@ -1,4 +1,3 @@
-// app/dashboard/page.tsx
 "use client";
 
 import { useState, useEffect, useActionState } from "react";
@@ -59,7 +58,7 @@ export default function DashboardPage() {
   const [callStatus, setCallStatus] = useState<CallStatus | null>(null);
   const [state, formAction] = useActionState(dialAction, null);
 
-  // ✅ Helper function to get loading messages based on strategy
+  // Helper function to get loading messages based on strategy
   const getAnalyzingMessage = (strategy: AMD_STRATEGY): string => {
     switch (strategy) {
       case "gemini":
@@ -103,7 +102,7 @@ export default function DashboardPage() {
   }, [state]);
 
   const pollCallStatus = async (callId: string) => {
-    // ✅ Poll duration varies by strategy
+    // Poll duration varies by strategy
     const maxAttempts = amdStrategy === "gemini" || amdStrategy === "huggingface" ? 60 : 30;
     let attempts = 0;
 
@@ -119,7 +118,7 @@ export default function DashboardPage() {
           return;
         }
 
-        // ✅ Dynamic status message based on selected strategy
+        // Dynamic status message based on selected strategy
         const statusMessage = 
           data.status === "completed" && !data.amdResult 
             ? getAnalyzingMessage(amdStrategy)
@@ -139,7 +138,7 @@ export default function DashboardPage() {
               : "Processing...",
         });
 
-        // ✅ Stop polling when we have an AMD result OR max attempts
+        // Stop polling when we have an AMD result OR max attempts
         if (
           (data.status === "completed" && data.amdResult) ||
           attempts >= maxAttempts

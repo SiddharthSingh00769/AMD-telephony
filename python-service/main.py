@@ -1,4 +1,3 @@
-# python-service/main.py
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -170,7 +169,6 @@ async def analyze_audio(request: AMDRequest) -> AMDResponse:
                 'end_sample': end
             })
         
-        # ====== IDENTIFY THE "ANSWER" SEGMENT ======
         # The answer is typically:
         # - After 5-10 seconds (after trial message)
         # - Before the last 8 seconds (before TwiML greeting)

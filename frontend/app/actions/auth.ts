@@ -32,12 +32,9 @@ type ActionResult = {
   error?: string;
 };
 
-/**
- * Server Action: Sign Up with Validation
- */
 export async function signUpAction(prevState: any, formData: FormData): Promise<ActionResult> {
   try {
-    // 1. Extract raw data
+    // Extract raw data
     const rawData = {
       name: formData.get("name") as string,
       email: formData.get("email") as string,
@@ -46,12 +43,12 @@ export async function signUpAction(prevState: any, formData: FormData): Promise<
 
     console.log("📝 Sign up attempt:", rawData.email);
 
-    // 2. ✅ Validate with Zod
+    // Validate with Zod
     const validatedData = signUpSchema.parse(rawData);
 
     console.log("✅ Validation passed");
 
-    // 3. Call Better-Auth with validated data
+    // Call Better-Auth with validated data
     const result = await auth.api.signUpEmail({
       body: {
         email: validatedData.email,
@@ -62,7 +59,7 @@ export async function signUpAction(prevState: any, formData: FormData): Promise<
 
     console.log("✅ Better-Auth signup successful");
 
-    // 4. Set cookie manually
+    // set cookie manually
     if (result && result.token) {
       const cookieStore = await cookies();
       cookieStore.set("better-auth.session_token", result.token, {
@@ -79,7 +76,7 @@ export async function signUpAction(prevState: any, formData: FormData): Promise<
   } catch (error: any) {
     console.error("❌ Sign up error:", error);
 
-    // ✅ Handle Zod validation errors
+    // Handle Zod validation errors
     if (error instanceof z.ZodError) {
       const firstError = error.issues[0];
       return {
@@ -100,12 +97,9 @@ export async function signUpAction(prevState: any, formData: FormData): Promise<
   }
 }
 
-/**
- * Server Action: Sign In with Validation
- */
 export async function signInAction(prevState: any, formData: FormData): Promise<ActionResult> {
   try {
-    // 1. Extract raw data
+    // Extract raw data
     const rawData = {
       email: formData.get("email") as string,
       password: formData.get("password") as string,
@@ -113,12 +107,12 @@ export async function signInAction(prevState: any, formData: FormData): Promise<
 
     console.log("🔐 Sign in attempt:", rawData.email);
 
-    // 2. ✅ Validate with Zod
+    // Validate with Zod
     const validatedData = signInSchema.parse(rawData);
 
     console.log("✅ Validation passed");
 
-    // 3. Call Better-Auth with validated data
+    // Call Better-Auth with validated data
     const result = await auth.api.signInEmail({
       body: {
         email: validatedData.email,
@@ -132,7 +126,7 @@ export async function signInAction(prevState: any, formData: FormData): Promise<
       return { error: "Invalid credentials" };
     }
 
-    // 4. Set cookie manually
+    // Set cookie manually
     if (result.token) {
       const cookieStore = await cookies();
       cookieStore.set("better-auth.session_token", result.token, {
@@ -149,7 +143,7 @@ export async function signInAction(prevState: any, formData: FormData): Promise<
   } catch (error: any) {
     console.error("❌ Sign in error:", error);
 
-    // ✅ Handle Zod validation errors
+    // Handle Zod validation errors
     if (error instanceof z.ZodError) {
       const firstError = error.issues[0];
       return {
@@ -163,13 +157,10 @@ export async function signInAction(prevState: any, formData: FormData): Promise<
   }
 }
 
-/**
- * Server Action: Sign Out
- */
 export async function signOutAction() {
   const cookieStore = await cookies();
   
-  // Just delete all cookies that might be auth-related
+  // delete all cookies that might be auth-related
   const cookieNames = [
     'better-auth.session_token',
     'better_auth.session_token',
@@ -181,7 +172,6 @@ export async function signOutAction() {
     try {
       cookieStore.delete(name);
     } catch (e) {
-      // Ignore errors
     }
   });
 
@@ -190,9 +180,6 @@ export async function signOutAction() {
   redirect('/signin');
 }
 
-/**
- * Get Current Session
- */
 export async function getSession() {
   try {
     const cookieStore = await cookies();
@@ -244,9 +231,6 @@ export async function getSession() {
   }
 }
 
-/**
- * Require Authentication
- */
 export async function requireAuth() {
   const session = await getSession();
 

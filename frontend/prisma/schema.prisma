@@ -8,7 +8,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ✅ Better-Auth compatible User model
+// Better-Auth compatible User model
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
@@ -25,7 +25,7 @@ model User {
   accounts      Account[]
 }
 
-// ✅ Better-Auth Account model (stores passwords)
+// Better-Auth Account model (stores passwords)
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -46,7 +46,7 @@ model Account {
   @@index([userId])
 }
 
-// ✅ Better-Auth Session model
+// Better-Auth Session model
 model Session {
   id        String   @id @default(cuid())
   userId    String
@@ -64,7 +64,7 @@ model Session {
   @@index([token])
 }
 
-// ✅ Verification model for Better-Auth
+// Verification model for Better-Auth
 model Verification {
   id         String   @id @default(cuid())
   identifier String
@@ -77,7 +77,7 @@ model Verification {
   @@unique([identifier, value])
 }
 
-// Call logs (unchanged)
+// Call logs
 model Call {
   id            String   @id @default(cuid())
   userId        String
@@ -109,7 +109,7 @@ model Call {
   @@index([amdResult])
 }
 
-// Test results (unchanged)
+// Test results
 model TestResult {
   id             String   @id @default(cuid())
   testNumber     String

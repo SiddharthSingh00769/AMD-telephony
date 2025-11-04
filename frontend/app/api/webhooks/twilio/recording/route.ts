@@ -1,4 +1,3 @@
-// app/api/webhooks/twilio/recording/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { detectWithGemini } from "@/lib/amd/gemini";
@@ -178,7 +177,7 @@ export async function POST(request: NextRequest) {
         // 3. Custom AMD application
         // 4. WebSocket connection for real-time audio
         
-        // For now, we'll use a simplified heuristic based on recording duration
+        // For now, we'll just hardcode it
         // In production, Jambonz would analyze audio in real-time during the call
         
         const duration = parseInt(recordingDuration) || 0;

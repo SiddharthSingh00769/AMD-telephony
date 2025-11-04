@@ -1,4 +1,3 @@
-// app/api/twiml/response/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -18,18 +17,18 @@ export async function POST(request: NextRequest) {
 
     // Build response based on what user said/pressed
     const twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-    <Say voice="Polly.Joanna" language="en-US">
-        Thank you! I heard you loud and clear.
-        ${speechResult ? `You said: ${speechResult.substring(0, 50)}.` : ''}
-        ${digits ? `You pressed: ${digits}.` : ''}
-    </Say>
-    <Pause length="1"/>
-    <Say voice="Polly.Joanna">
-        This test is now complete. Goodbye!
-    </Say>
-    <Hangup/>
-</Response>`;
+    <Response>
+        <Say voice="Polly.Joanna" language="en-US">
+            Thank you! I heard you loud and clear.
+            ${speechResult ? `You said: ${speechResult.substring(0, 50)}.` : ''}
+            ${digits ? `You pressed: ${digits}.` : ''}
+        </Say>
+        <Pause length="1"/>
+        <Say voice="Polly.Joanna">
+            This test is now complete. Goodbye!
+        </Say>
+        <Hangup/>
+    </Response>`;
 
     console.log("✅ Response TwiML Generated");
     console.log("===== TWIML RESPONSE COMPLETE =====\n");

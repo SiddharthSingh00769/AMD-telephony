@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-/**
- * GET/POST /api/twiml/jambonz
- * Returns TwiML for Jambonz SIP routing (to be implemented)
- */
 export async function GET(request: NextRequest) {
   return handleJambonz(request);
 }
