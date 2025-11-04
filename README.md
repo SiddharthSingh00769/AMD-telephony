@@ -12,6 +12,9 @@
 
 ## 🎯 Project Overview
 
+🎥 **Demo Video:**  
+[▶ Watch Full Project Walkthrough on Loom](https://www.loom.com/share/ef35946e7972431e93f7eb8ed861c4fa)
+
 This project implements and evaluates **4 different Answering Machine Detection (AMD) strategies** to determine the most effective approach for production telephony systems. Through **101 comprehensive test calls** and rigorous statistical analysis, we provide data-driven recommendations for real-world deployment.
 
 ### 🌟 Key Highlights
